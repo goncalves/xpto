@@ -1,0 +1,38 @@
+version: "3.1"
+services:
+
+    mysql:
+      image: mysql:8.0
+      container_name: xpto-mysql
+      working_dir: /application
+      volumes:
+        - .:/application
+      environment:
+        - MYSQL_ROOT_PASSWORD=xptoroot
+        - MYSQL_DATABASE=xpto
+        - MYSQL_USER=xpto
+        - MYSQL_PASSWORD=xptoroot
+      ports:
+        - "8082:3306"
+
+    elasticsearch:
+      image: elasticsearch:6.5.4
+      container_name: xpto-elasticsearch
+
+    webserver:
+      image: nginx:alpine
+      container_name: xpto-webserver
+      working_dir: /application
+      volumes:
+          - .:/application
+          - ./phpdocker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      ports:
+       - "8080:80"
+
+    php-fpm:
+      build: phpdocker/php-fpm
+      container_name: xpto-php-fpm
+      working_dir: /application
+      volumes:
+        - .:/application
+        - ./phpdocker/php-fpm/php-ini-overrides.ini:/etc/php/7.3/fpm/conf.d/99-overrides.ini
